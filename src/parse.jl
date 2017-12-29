@@ -14,10 +14,10 @@ const global IS_NATIVE_LE = Base.ENDIAN_BOM == 0x04030201
 
 function ReadTxt(txt_path::String)
   # store the bytes in the BOM position [may lack BOM altogether]
-  bom_check = open(pdir, "r") do f
+  bom_check = open(txt_path, "r") do f
     read(f, 2)
   end
-  txtlines = open(pdir, "r") do f
+  txtlines = open(txt_path, "r") do f
     if bom_check == [0xff, 0xfe]
       # utf-16le encoding detected, read bytes accordingly
       if IS_NATIVE_LE
