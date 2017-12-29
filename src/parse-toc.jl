@@ -23,7 +23,9 @@ function GetChapterInfo(toc_line::String)
   ch_n = match(r"\[(\d+)\]", toc_line)
   ch_p = match(r"⠶\s(\d+)\s⠶", toc_line)
   ch_t = match(r"⠶\s(.+)$", toc_line, ch_p.offsets[1])
-  return Dict("n" => ch_n[1], "page" => ch_p[1], "title" => ch_t[1])
+  return Dict("n" => parse(Int64, ch_n[1]),
+	      "page" => parse(Int64, ch_p[1]),
+	      "title" => ch_t[1])
 end
 
 function GetPartInfo(toc_line::String)
