@@ -23,7 +23,8 @@ function ReadTxt(txt_path::String)
       if IS_NATIVE_LE
         chars = map(Char, reinterpret(UInt16, read(f)))
         linebreaks = find(x->x == '\n', chars)
-        [chars[r] |> String for r in lineranges(linebreaks, 1)]
+        lines = [chars[r] |> String for r in lineranges(linebreaks, 1)]
+        map(chomp, lines)
       else
         error("System [native] is big endian but encoding is UTF-16LE")
       end
@@ -31,11 +32,11 @@ function ReadTxt(txt_path::String)
       error("File is UTF-16BE encoded, not coded for")
     else
       # proceed assuming UTF-8 encoding and no BOM
-      readlines(f)
+      map(chomp, readlines(f))
     end
   end;
 end
 
-ocr_ver = ReadTxt(to_ocr)
-p2t_ver = ReadTxt(to_p2t)
-lab_ver = ReadTxt(to_lab)
+ocr_ver = ReadTxt(to_ocr);
+p2t_ver = ReadTxt(to_p2t);
+lab_ver = ReadTxt(to_lab);
