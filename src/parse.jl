@@ -1,8 +1,8 @@
 """
 Turn newline positions into ranges
 """
-function lineranges(newlines, BOM_offset::Int = 0)
-  starts = vcat(1 + BOM_offset, 1 + newlines[1:end-1])
+function lineranges(newlines, bom_offset::Int = 0)
+  starts = vcat(1 + bom_offset, 1 + newlines[1:end-1])
   return [i:j for j in newlines, i in starts] |> diag
 end
 
@@ -14,11 +14,11 @@ const global IS_NATIVE_LE = Base.ENDIAN_BOM == 0x04030201
 
 function ReadTxt(txt_path::String)
   # store the bytes in the BOM position [may lack BOM altogether]
-  BOM_check = open(pdir, "r") do f
+  bom_check = open(pdir, "r") do f
     read(f, 2)
   end
   txtlines = open(pdir, "r") do f
-    if BOM_check == [0xff, 0xfe]
+    if bom_check == [0xff, 0xfe]
       # utf-16le encoding detected, read bytes accordingly
       if IS_NATIVE_LE
         chars = map(Char, reinterpret(UInt16, read(f)))
@@ -27,7 +27,7 @@ function ReadTxt(txt_path::String)
       else
         error("System [native] is big endian but encoding is UTF-16LE")
       end
-    elseif BOM_check == [0xfe, 0xff]
+    elseif bom_check == [0xfe, 0xff]
       error("File is UTF-16BE encoded, not coded for")
     else
       # proceed assuming UTF-8 encoding and no BOM
