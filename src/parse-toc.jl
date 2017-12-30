@@ -1,3 +1,4 @@
+import DataStructures: OrderedDict
 to_toc = joinpath(dirname(Base.source_path()), "../contents.mmt")
 
 function ReadTOC(toc_path::String)
@@ -12,10 +13,11 @@ function MakeTocIndexes(toc_lines::Array{String,1})
   ind = Dict()
   ind["parts"] = find(x->startswith(x, "-:"), toc_lines)
   append!(ind["parts"], find(x->startswith(x, "-,:"), toc_lines))
-  sort!(ind["parts"])
+  ind["parts"] = map(x->x => GetPartInfo(toc_lines[x]), ind["parts"])
   ind["chapters"] = find(x->startswith(x, "-.."), toc_lines)
   append!(ind["chapters"], find(x->startswith(x, "-.,"), toc_lines))
   sort!(ind["chapters"])
+  ind["chapters"] = map(x->GetChapterInfo(toc_lines[x])["n"] => GetChapterInfo(toc_lines[x]), ind["chapters"]) |> OrderedDict
   return ind
 end
 
