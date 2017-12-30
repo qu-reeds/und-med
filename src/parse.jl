@@ -41,8 +41,3 @@ ocr_ver = ReadTxt(to_ocr)
 p2t_ver = ReadTxt(to_p2t)
 p2t_pages = map(x->split(x, "\n"), split(join(p2t_ver, '\n'), "\f"))[1:end-1]
 lab_ver = ReadTxt(to_lab)
-
-# mn = map(x->ismatch(r"\f", x), p2t_ver) |> find
-# f_count = map(length, map(x->matchall(r"\f", x), p2t_ver[mn]))
-# doublef_lines = find(x->x == 2, f_count)
-# hcat(mn[doublef_lines], doublef_lines, p2t_ver[mn][doublef_lines])
