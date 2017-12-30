@@ -6,19 +6,6 @@ function LineRanges(newlines::Array{Int,1}, bom_offset::Int = 0)
   return [i:j for j in newlines, i in starts] |> diag
 end
 
-"""
-Generate array of pseudo-pages
-(fewer pseudo-pages detected than actual pages, must be errors)
-"""
-function PseudoPageRanges(docu::Array{String,1})
-  pseudop_starts = find(x->startswith(x, "\f"), docu)
-  pseudop_ends = pseudop_starts - 1
-  prepend!(pseudop_starts, [1])
-  # turns out this is wrong RE final page but use it for initial estimate:
-  append!(pseudop_ends, length(docu))
-  return [i:j for j in pseudop_ends, i in pseudop_starts] |> diag
-end
-
 to_ocr = joinpath(dirname(Base.source_path()), "../txt/ocr/ocr.txt")
 to_p2t = joinpath(dirname(Base.source_path()), "../txt/ocr/p2t.txt")
 to_lab = joinpath(dirname(Base.source_path()), "../txt/lab404/understanding_media.txt")
@@ -52,5 +39,10 @@ end
 
 ocr_ver = ReadTxt(to_ocr)
 p2t_ver = ReadTxt(to_p2t)
+p2t_pages = map(x->split(x, "\n"), split(join(p2t_ver, '\n'), "\f"))[1:end-1]
 lab_ver = ReadTxt(to_lab)
-p2t_pseudo_pages = PseudoPageRanges(p2t_ver);
+
+# mn = map(x->ismatch(r"\f", x), p2t_ver) |> find
+# f_count = map(length, map(x->matchall(r"\f", x), p2t_ver[mn]))
+# doublef_lines = find(x->x == 2, f_count)
+# hcat(mn[doublef_lines], doublef_lines, p2t_ver[mn][doublef_lines])
