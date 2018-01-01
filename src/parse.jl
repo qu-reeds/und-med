@@ -1,3 +1,5 @@
+include("parse-toc.jl")
+
 """
 Turn newline positions into ranges
 """
@@ -37,8 +39,25 @@ function ReadTxt(txt_path::String)
   end;
 end
 
+"""
+Index pages (via \f characters) and chapters (using TOC), according to an
+offset (the page the first listed chapter begins on) and an end point (the
+page the last listed chapter ends on) - both using PDF not TOC numbering.
+For UM, Ch. 0 (Introduction, unnumbered in the book) begins on book p.3
+(p.25 of the PDF), and Ch. 34 (Further Readings, also unnumbered in the
+book) ends on page 365 (p. 387 of the PDF).
+"""
+function IndexPgCh(docu::Array{String,1}, pdf_pg_start::Int, pdf_pg_end::Int)
+  # note that final form feed is erroneous so index it away
+  pages = map(x->split(x, "\n"), split(join(p2t_ver, '\n'), "\f"))[1:end-1]
+  ch_list = TOC["indexed"]["chapters"]
+  first_ch = ch_list.keys[1] # 0
+  first_ch_start_p = ch_list[first_ch]["page"]
+  pdf_pg_increment = pg_offset - first_ch_start_p
+  
+end
+
 ocr_ver = ReadTxt(to_ocr)
 p2t_ver = ReadTxt(to_p2t)
-# note that final form feed is erroneous so index it away
-p2t_pages = map(x->split(x, "\n"), split(join(p2t_ver, '\n'), "\f"))[1:end-1]
+p2t_pages = IndexPgCh(p2t_ver, 25, 387)
 lab_ver = ReadTxt(to_lab)
